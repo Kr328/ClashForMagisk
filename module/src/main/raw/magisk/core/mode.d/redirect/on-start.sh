@@ -55,7 +55,7 @@ assert iptables -t nat -A CLASH_EXTERNAL -d 169.254.0.0/16 -j RETURN
 assert iptables -t nat -A CLASH_EXTERNAL -d 240.0.0.0/4 -j RETURN
 assert iptables -t nat -A CLASH_EXTERNAL -d 192.168.0.0/16 -j RETURN
 assert iptables -t nat -A CLASH_EXTERNAL -d 10.0.0.0/8 -j RETURN
-assert iptables -t nat -A CLASH_LOCAL -p tcp -j REDIRECT --to-ports ${CLASH_REDIR_PORT}
+assert iptables -t nat -A CLASH_EXTERNAL -p tcp -j REDIRECT --to-ports ${CLASH_REDIR_PORT}
 
 assert iptables -t nat -I OUTPUT -p tcp -j CLASH_LOCAL
 assert iptables -t nat -I PREROUTING -p tcp -j CLASH_EXTERNAL

@@ -1,6 +1,6 @@
 id=clash_for_magisk
 name=Clash for Magisk
-version=v2
-versionCode=2
+version=v3
+versionCode=3
 author=Dreamacro (module by Kr328)
 description=A rule-based tunnel in Go.
