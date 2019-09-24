@@ -1,8 +1,13 @@
 package com.github.kr328.clash.runner;
 
-import com.github.kr328.clash.ClashConfigure;
-import com.github.kr328.clash.StarterConfigure;
+import android.net.Uri;
+import com.github.kr328.clash.configure.ClashConfigure;
+import com.github.kr328.clash.configure.StarterConfigure;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ClashManager implements ClashProcess.Callback {
@@ -13,6 +18,9 @@ public class ClashManager implements ClashProcess.Callback {
 
     private LinkedBlockingQueue<Command> commandList = new LinkedBlockingQueue<>();
     private Command currentCommand;
+
+    private ClashConfigure clashConfigure = new ClashConfigure();
+    private StarterConfigure starterConfigure = new StarterConfigure();
 
     public ClashManager(String baseDir, String dataDir) {
         this.baseDir = baseDir;
@@ -106,6 +114,29 @@ public class ClashManager implements ClashProcess.Callback {
             }
         }
     }
+
+    private class WaitExternalCommand extends Command {
+        @Override
+        void exec() throws InterruptedException {
+            if ( clashConfigure.externalController == null )
+                return;
+
+            Uri uri = Uri.parse("http://" + clashConfigure.externalController);
+
+            if ( uri == null || uri.getHost() == null || uri.getPort() < 0 )
+                return;
+
+            InetSocketAddress address = InetSocketAddress.
+                    createUnresolved(uri.getHost(), uri.getPort());
+
+            Socket socket = new Socket();
+
+            try {
+                socket.connect(address);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     private class ReloadCommand extends Command {
         @Override

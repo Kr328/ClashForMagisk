@@ -1,6 +1,8 @@
 package com.github.kr328.clash;
 
 import android.util.Log;
+import com.github.kr328.clash.configure.ClashConfigure;
+import com.github.kr328.clash.configure.StarterConfigure;
 import com.github.kr328.clash.runner.ClashRunner;
 
 import java.io.File;
@@ -31,7 +33,7 @@ public class Starter {
 
         ClashRunner runner = new ClashRunner(baseDir, dataDir, new ClashRunner.Callback() {
            @Override
-            public void onStarted(ClashRunner runner, StarterConfigure starter ,ClashConfigure clash) {
+            public void onStarted(ClashRunner runner, StarterConfigure starter , ClashConfigure clash) {
                 Utils.deleteFiles(dataDir, "RUNNING", "STOPPED");
                 
                 proxySetup.execOnStarted(starter, clash);

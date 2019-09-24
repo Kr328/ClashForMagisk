@@ -1,6 +1,8 @@
 package com.github.kr328.clash;
 
 import android.util.Log;
+import com.github.kr328.clash.configure.ClashConfigure;
+import com.github.kr328.clash.configure.StarterConfigure;
 
 import java.io.BufferedReader;
 import java.io.File;

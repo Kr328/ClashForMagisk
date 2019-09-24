@@ -1,4 +1,4 @@
-package com.github.kr328.clash;
+package com.github.kr328.clash.configure;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class StarterConfigure {
-    String mode;
+    public String mode;
 
     static public StarterConfigure loadFromFile(File file) throws IOException {
         Map root = new Yaml(new SafeConstructor()).load(new FileReader(file));

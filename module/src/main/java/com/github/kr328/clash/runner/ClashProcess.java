@@ -1,10 +1,7 @@
 package com.github.kr328.clash.runner;
 
 import android.util.Log;
-import com.github.kr328.clash.ClashConfigure;
 import com.github.kr328.clash.Constants;
-import com.github.kr328.clash.StarterConfigure;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.*;
 import java.util.regex.Matcher;
