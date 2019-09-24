@@ -1,12 +1,15 @@
-package com.github.kr328.clash;
+package com.github.kr328.clash.runner;
 
 import android.util.Log;
+import com.github.kr328.clash.ClashConfigure;
+import com.github.kr328.clash.Constants;
+import com.github.kr328.clash.StarterConfigure;
 import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.*;
 import java.util.regex.Matcher;
 
-class ClashRunner {
+public class ClashRunner {
     interface Callback {
         void onStarted(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
         void onStopped(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
@@ -27,7 +30,7 @@ class ClashRunner {
         this.callback = callback;
     }
 
-    synchronized void start() {
+    synchronized public void start() {
         if (process != null)
             return;
 
@@ -101,7 +104,7 @@ class ClashRunner {
         callback.onStarted(this, starterConfigure, clashConfigure);
     }
 
-    synchronized void stop() {
+    synchronized public void stop() {
         if (process == null)
             return;
 

@@ -8,10 +8,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
-class StarterConfigure {
+public class StarterConfigure {
     String mode;
 
-    static StarterConfigure loadFromFile(File file) throws IOException {
+    static public StarterConfigure loadFromFile(File file) throws IOException {
         Map root = new Yaml(new SafeConstructor()).load(new FileReader(file));
 
         StarterConfigure result = new StarterConfigure();
