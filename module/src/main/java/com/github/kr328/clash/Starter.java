@@ -1,7 +1,6 @@
 package com.github.kr328.clash;
 
 import android.util.Log;
-import com.github.kr328.clash.runner.ClashRunner;
 
 import java.io.File;
 import java.io.IOException;
