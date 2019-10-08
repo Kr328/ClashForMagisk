@@ -27,3 +27,6 @@ gradle-app.setting
 
 # clion cmake build
 cmake-build-*
+
+# local properties
+local.properties
