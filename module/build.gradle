@@ -19,7 +19,7 @@ dex {
 magisk {
     output "$buildDir/outputs/clash-for-magisk.zip"
     
-    zip.map(file("src/main/raw/magisk"), "/")
+    zip.map(file("$buildDir/intermediate/magisk/"), "/")
     zip.map(file("$buildDir/outputs/dex/classes.jar"), "/core/starter.jar")
     zip.map(file("$buildDir/outputs/ndk/arm64-v8a/executable/setuidgid"), "/core/setuidgid")
     zip.map(file("$buildDir/outputs/ndk/arm64-v8a/executable/daemonize"), "/core/daemonize")
@@ -39,3 +39,25 @@ jar {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+
+task setupMagiskFiles(type: Copy) {
+    from "src/main/raw/magisk"
+    into "$buildDir/intermediate/magisk/"
+
+    doLast {
+        def moduleCommitCount = Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
+
+        def clashCommitId = 'git rev-parse --short HEAD'.execute([], new File(buildDir, "intermediate/cmake/arm64-v8a/clash-build")).text.trim()
+        def clashCommitCount = Integer.parseInt('git rev-list --count HEAD'.execute([], new File(buildDir, "intermediate/cmake/arm64-v8a/clash-build")).text.trim())
+
+        def version = "$clashCommitId"
+        def versionCode = "$clashCommitCount$moduleCommitCount"
+
+        def file = new File(buildDir, "intermediate/magisk/module.prop")
+        def content = file.getText("utf-8").replace("%%VERSION%%", version).replace("%%VERSIONCODE%%", versionCode.toString())
+        file.write(content)
+    }
+}
+
+setupMagiskFiles.dependsOn(ndkBuild)
+magiskModule.dependsOn(setupMagiskFiles)
