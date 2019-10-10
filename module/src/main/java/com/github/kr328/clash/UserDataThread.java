@@ -5,6 +5,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.URL;
 
+@Deprecated
 public class UserDataThread extends Thread {
     private String dataDir;
     private StarterConfigure starterConfigure;
