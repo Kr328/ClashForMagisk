@@ -29,26 +29,45 @@ public class Starter {
         ProxySetup proxySetup = new ProxySetup(baseDir, dataDir);
 
         ClashRunner runner = new ClashRunner(baseDir, dataDir, new ClashRunner.Callback() {
-           @Override
+            @Override
+            public boolean onPrepare(ClashRunner runner, StarterConfigure starter, ClashConfigure clash) {
+                try {
+                    proxySetup.execOnPrepare(starter, clash);
+                } catch (IOException e) {
+                    Log.e(Constants.TAG, "Run prepare script failure " + e.getMessage());
+                    return true; // blocking start
+                }
+                return false; // start now
+            }
+
+            @Override
             public void onStarted(ClashRunner runner, StarterConfigure starter ,ClashConfigure clash) {
                 Utils.deleteFiles(dataDir, "RUNNING", "STOPPED");
-                
-                proxySetup.execOnStarted(starter, clash);
-                
+
+                try {
+                    proxySetup.execOnStarted(starter, clash);
+                } catch (IOException e) {
+                    Log.e(Constants.TAG, "Run start script failure " + e.getMessage());
+                    runner.stop();
+                    return;
+                }
+
                 try {
                     //noinspection ResultOfMethodCallIgnored
                     new File(dataDir, "RUNNING").createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                } catch (IOException ignored) {}
             }
 
             @Override
             public void onStopped(ClashRunner runner, StarterConfigure starter, ClashConfigure clash) {
                 Utils.deleteFiles(dataDir, "RUNNING", "STOPPED");
-                
-                proxySetup.execOnStop(starter, clash);
-                
+
+                try {
+                    proxySetup.execOnStop(starter, clash);
+                } catch (IOException e) {
+                    Log.w(Constants.TAG, "Run stop script failure " + e.getMessage());
+                }
+
                 try {
                     //noinspection ResultOfMethodCallIgnored
                     new File(dataDir, "STOPPED").createNewFile();

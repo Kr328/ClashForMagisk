@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 
 class ClashRunner {
     interface Callback {
+        boolean onPrepare(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
         void onStarted(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
         void onStopped(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
    }
@@ -50,6 +51,10 @@ class ClashRunner {
                 return;
             }
 
+            if ( callback.onPrepare(this, starterConfigure, clashConfigure) ) {
+                return;
+            }
+
             String command = Constants.STARTER_COMMAND_TEMPLATE
                     .replace("{BASE_DIR}", baseDir)
                     .replace("{DATA_DIR}", dataDir)
@@ -60,7 +65,6 @@ class ClashRunner {
             Log.d(Constants.TAG, "Starting clash " + command);
 
             process = Runtime.getRuntime().exec("/system/bin/sh");
-
 	    
             process.getOutputStream().write(("echo PID=[$$]\n").getBytes());
             process.getOutputStream().write(("exec " + command + "\n").getBytes());
@@ -107,5 +111,4 @@ class ClashRunner {
 
         android.os.Process.killProcess(pid);
     }
-
 }

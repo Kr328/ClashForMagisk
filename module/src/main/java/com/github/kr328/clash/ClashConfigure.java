@@ -8,23 +8,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
-public class ClashConfigure {
+class ClashConfigure {
     String portHttp;
     String portSocks;
-    String portRedir;
+    String portRedirect;
     String portDns;
+    String externalController;
 
-    public static ClashConfigure loadFromFile(File file) throws IOException {
+    static ClashConfigure loadFromFile(File file) throws IOException {
         Map root = new Yaml(new SafeConstructor()).load(new FileReader(file));
         ClashConfigure result = new ClashConfigure();
 
-        result.portHttp = valueOfOrNull(root.get("port"));
-        result.portSocks = valueOfOrNull(root.get("socks-port"));
-        result.portRedir = valueOfOrNull(root.get("redir-port"));
+        result.portHttp = validPortOrNull(valueOfOrNull(root.get("port")));
+        result.portSocks = validPortOrNull(valueOfOrNull(root.get("socks-port")));
+        result.portRedirect = validPortOrNull(valueOfOrNull(root.get("redir-port")));
+        result.externalController = valueOfOrNull(root.get("external-controller"));
 
         Map dns = (Map) root.get("dns");
         if ( dns != null && (boolean) dns.get("enable") && dns.containsKey("listen") ) {
-            result.portDns = String.valueOf(dns.get("listen")).split(":")[1];
+            result.portDns = validPortOrNull(String.valueOf(dns.get("listen")).split(":")[1]);
         }
 
         return result;
@@ -34,5 +36,15 @@ public class ClashConfigure {
         if ( object == null )
             return null;
         return String.valueOf(object);
+    }
+
+    private static String validPortOrNull(String data) {
+        if ( data == null )
+            return null;
+
+        if ( Integer.parseInt(data) <= 1024)
+            return null;
+
+        return data;
     }
 }
