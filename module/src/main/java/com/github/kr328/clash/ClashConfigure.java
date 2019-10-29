@@ -13,7 +13,6 @@ class ClashConfigure {
     String portSocks;
     String portRedirect;
     String portDns;
-    String externalController;
 
     static ClashConfigure loadFromFile(File file) throws IOException {
         Map root = new Yaml(new SafeConstructor()).load(new FileReader(file));
@@ -22,7 +21,6 @@ class ClashConfigure {
         result.portHttp = validPortOrNull(valueOfOrNull(root.get("port")));
         result.portSocks = validPortOrNull(valueOfOrNull(root.get("socks-port")));
         result.portRedirect = validPortOrNull(valueOfOrNull(root.get("redir-port")));
-        result.externalController = valueOfOrNull(root.get("external-controller"));
 
         Map dns = (Map) root.get("dns");
         if ( dns != null && (boolean) dns.get("enable") && dns.containsKey("listen") ) {

@@ -7,21 +7,14 @@ import java.io.*;
 import java.util.regex.Matcher;
 
 class ClashRunner {
-    interface Callback {
-        boolean onPrepare(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
-        void onStarted(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
-        void onStopped(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
-   }
-
     private String baseDir;
     private String dataDir;
     private Process process;
     private Callback callback;
-
     private StarterConfigure starterConfigure;
     private ClashConfigure clashConfigure;
     private int pid;
-
+    private boolean restart;
     ClashRunner(String baseDir, String dataDir, Callback callback) {
         this.baseDir = baseDir;
         this.dataDir = dataDir;
@@ -36,22 +29,21 @@ class ClashRunner {
             try {
                 starterConfigure = StarterConfigure.loadFromFile(new File(dataDir + "/starter.yaml"));
 
-                if ( new File(dataDir + "/config.yaml").exists() ) {
+                if (new File(dataDir + "/config.yaml").exists()) {
                     clashConfigure = ClashConfigure.loadFromFile(new File(dataDir + "/config.yaml"));
-                }
-                else if ( new File(dataDir + "/config.yml").exists() ) {
+                } else if (new File(dataDir + "/config.yml").exists()) {
                     clashConfigure = ClashConfigure.loadFromFile(new File(dataDir + "/config.yml"));
-                }
-                else {
+                } else {
                     throw new FileNotFoundException("Clash config file not found");
                 }
-            }
-            catch (IOException|YAMLException e) {
+            } catch (IOException | YAMLException e) {
                 Log.e(Constants.TAG, "Unable to start clash", e);
+                restart = false;
                 return;
             }
 
-            if ( callback.onPrepare(this, starterConfigure, clashConfigure) ) {
+            if (callback.onPrepare(this, starterConfigure, clashConfigure)) {
+                restart = false;
                 return;
             }
 
@@ -65,7 +57,7 @@ class ClashRunner {
             Log.d(Constants.TAG, "Starting clash " + command);
 
             process = Runtime.getRuntime().exec("/system/bin/sh");
-	    
+
             process.getOutputStream().write(("echo PID=[$$]\n").getBytes());
             process.getOutputStream().write(("exec " + command + "\n").getBytes());
             process.getOutputStream().flush();
@@ -77,11 +69,14 @@ class ClashRunner {
                 try {
                     while ((line = reader.readLine()) != null) {
                         Matcher matcher = Constants.PATTERN_CLASH_PID.matcher(line);
-                        if ( matcher.matches() ) {
+                        if (matcher.matches()) {
                             pid = Integer.parseInt(matcher.group(1));
                             break;
                         }
                     }
+
+                    Log.i(Constants.TAG, "Clash started");
+                    callback.onStarted(this, starterConfigure, clashConfigure);
 
                     while ((line = reader.readLine()) != null)
                         Log.i(Constants.TAG, line);
@@ -92,17 +87,23 @@ class ClashRunner {
                         process = null;
 
                         callback.onStopped(this, starterConfigure, clashConfigure);
+
+                        if ( restart ) {
+                            restart = false;
+                            this.start();
+                        }
                     }
                 } catch (IOException e) {
                     Log.i(Constants.TAG, "Clash stdout closed");
+
+                    restart = false;
                 }
             }).start();
         } catch (IOException e) {
             Log.e(Constants.TAG, "Start clash process failure", e);
-        }
 
-        Log.i(Constants.TAG, "Clash started");
-        callback.onStarted(this, starterConfigure, clashConfigure);
+            restart = false;
+        }
     }
 
     synchronized void stop() {
@@ -110,5 +111,22 @@ class ClashRunner {
             return;
 
         android.os.Process.killProcess(pid);
+    }
+
+    synchronized void restart() {
+        if (process == null)
+            start();
+        else {
+            restart = true;
+            stop();
+        }
+    }
+
+    interface Callback {
+        boolean onPrepare(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
+
+        void onStarted(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
+
+        void onStopped(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
     }
 }
