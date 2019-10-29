@@ -1,11 +1,16 @@
 package com.github.kr328.clash;
 
+import android.content.pm.IPackageManager;
+import android.content.pm.PackageInfo;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
 class ProxySetup {
@@ -17,7 +22,7 @@ class ProxySetup {
         this.baseDir = baseDir;
     }
 
-    void execOnPrepare(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws IOException {
+    void execOnPrepare(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws Exception {
         File script = new File(dataDir + "/mode.d/" + starterConfigure.mode + "/on-prepare.sh");
         if (!script.exists())
             script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-prepare.sh");
@@ -34,8 +39,10 @@ class ProxySetup {
             env.put("CLASH_SOCKS_PORT", clashConfigure.portSocks);
         if (clashConfigure.portRedirect != null)
             env.put("CLASH_REDIR_PORT", clashConfigure.portRedirect);
-        if (clashConfigure.portDns != null)
-            env.put("CLASH_DNS_PORT", clashConfigure.portDns);
+        if (clashConfigure.dns != null && clashConfigure.dns.enable && clashConfigure.dns.listen != null)
+            env.put("CLASH_DNS_PORT", clashConfigure.dns.listen.split(":")[1]);
+        if (starterConfigure.blacklist != null)
+            env.put("PROXY_BLACKLIST_UID", buildUidList(starterConfigure));
 
         env.put("CLASH_UID", Constants.CLASH_UID);
         env.put("CLASH_GID", Constants.CLASH_GID);
@@ -43,7 +50,7 @@ class ProxySetup {
         exec("sh " + script.getAbsolutePath(), env);
     }
 
-    void execOnStarted(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws IOException {
+    void execOnStarted(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws Exception {
         File script = new File(dataDir + "/mode.d/" + starterConfigure.mode + "/on-start.sh");
         if (!script.exists())
             script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-start.sh");
@@ -60,8 +67,10 @@ class ProxySetup {
             env.put("CLASH_SOCKS_PORT", clashConfigure.portSocks);
         if (clashConfigure.portRedirect != null)
             env.put("CLASH_REDIR_PORT", clashConfigure.portRedirect);
-        if (clashConfigure.portDns != null)
-            env.put("CLASH_DNS_PORT", clashConfigure.portDns);
+        if (clashConfigure.dns != null && clashConfigure.dns.enable && clashConfigure.dns.listen != null)
+            env.put("CLASH_DNS_PORT", clashConfigure.dns.listen.split(":")[1]);
+        if (starterConfigure.blacklist != null)
+            env.put("PROXY_BLACKLIST_UID", buildUidList(starterConfigure));
 
         env.put("CLASH_UID", Constants.CLASH_UID);
         env.put("CLASH_GID", Constants.CLASH_GID);
@@ -69,7 +78,7 @@ class ProxySetup {
         exec("sh " + script.getAbsolutePath(), env);
     }
 
-    void execOnStop(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws IOException {
+    void execOnStop(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws Exception {
         File script = new File(dataDir + "/mode.d/" + starterConfigure.mode + "/on-stop.sh");
         if (!script.exists())
             script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-stop.sh");
@@ -86,8 +95,10 @@ class ProxySetup {
             env.put("CLASH_SOCKS_PORT", clashConfigure.portSocks);
         if (clashConfigure.portRedirect != null)
             env.put("CLASH_REDIR_PORT", clashConfigure.portRedirect);
-        if (clashConfigure.portDns != null)
-            env.put("CLASH_DNS_PORT", clashConfigure.portDns);
+        if (clashConfigure.dns != null && clashConfigure.dns.enable && clashConfigure.dns.listen != null)
+            env.put("CLASH_DNS_PORT", clashConfigure.dns.listen.split(":")[1]);
+        if (starterConfigure.blacklist != null)
+            env.put("PROXY_BLACKLIST_UID", buildUidList(starterConfigure));
 
         env.put("CLASH_UID", Constants.CLASH_UID);
         env.put("CLASH_GID", Constants.CLASH_GID);
@@ -125,5 +136,39 @@ class ProxySetup {
 
         process.destroy();
         process.destroyForcibly();
+    }
+
+    private String buildUidList(StarterConfigure starterConfigure) throws RemoteException {
+        IPackageManager pm = IPackageManager.Stub.asInterface(ServiceManager.getService("package"));
+        StringBuilder result = new StringBuilder();
+
+        for ( String line : starterConfigure.blacklist ) {
+            String[] split = line.split(":");
+
+            switch (split[0]) {
+                case "package":
+                    PackageInfo packageInfo =
+                            pm.getPackageInfo(split[1], 0, split.length == 3 ? Integer.parseInt(split[2]) : 0);
+                    if ( packageInfo == null ) {
+                        Log.w(Constants.TAG, "Package " + split[1] + " not found. Ignore.");
+                        break;
+                    }
+                    result.append(packageInfo.applicationInfo.uid).append(' ');
+                    break;
+                case "uid":
+                    result.append(split[1]).append(' ');
+                    break;
+                case "user":
+                    int uid = android.os.Process.getUidForName(split[1]);
+                    if ( uid < 0 ) {
+                        Log.w(Constants.TAG, "Invalid user " + split[1] + ". Ignore.");
+                        break;
+                    }
+                    result.append(uid).append(' ');
+                    break;
+            }
+        }
+
+        return result.toString();
     }
 }

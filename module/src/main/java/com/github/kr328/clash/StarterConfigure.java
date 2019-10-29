@@ -1,29 +1,36 @@
 package com.github.kr328.clash;
 
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 class StarterConfigure {
     String mode;
+    List<String> blacklist;
 
     static StarterConfigure loadFromFile(File file) throws IOException {
-        Map root = new Yaml(new SafeConstructor()).load(new FileReader(file));
+        FileInputStream inputStream = new FileInputStream(file);
+        Constructor constructor = new Constructor(StarterConfigure.class);
 
-        StarterConfigure result = new StarterConfigure();
+        constructor.setPropertyUtils(new PropertyUtils() {
+            {
+                setSkipMissingProperties(true);
+            }
+        });
 
-        result.mode = valueOfOrDefault(root.get("mode"), "proxy-only");
+        StarterConfigure result =  new Yaml(constructor).loadAs(inputStream, StarterConfigure.class);
+
+        inputStream.close();
 
         return result;
     }
 
-    private static String valueOfOrDefault(Object object, String fallback) {
-        if ( object == null )
-            return fallback;
-        return String.valueOf(object);
-    }
 }

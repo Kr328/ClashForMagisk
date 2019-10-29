@@ -33,7 +33,7 @@ public class Starter {
             public boolean onPrepare(ClashRunner runner, StarterConfigure starter, ClashConfigure clash) {
                 try {
                     proxySetup.execOnPrepare(starter, clash);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Run prepare script failure " + e.getMessage());
                     return true; // blocking start
                 }
@@ -46,7 +46,7 @@ public class Starter {
 
                 try {
                     proxySetup.execOnStarted(starter, clash);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.e(Constants.TAG, "Run start script failure " + e.getMessage());
                     runner.stop();
                     return;
@@ -55,7 +55,7 @@ public class Starter {
                 try {
                     //noinspection ResultOfMethodCallIgnored
                     new File(dataDir, "RUNNING").createNewFile();
-                } catch (IOException ignored) {}
+                } catch (Exception ignored) {}
             }
 
             @Override

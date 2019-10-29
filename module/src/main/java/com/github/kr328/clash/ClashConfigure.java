@@ -1,9 +1,13 @@
 package com.github.kr328.clash;
 
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.introspector.PropertyUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
@@ -12,37 +16,43 @@ class ClashConfigure {
     String portHttp;
     String portSocks;
     String portRedirect;
-    String portDns;
+    Dns dns;
 
     static ClashConfigure loadFromFile(File file) throws IOException {
-        Map root = new Yaml(new SafeConstructor()).load(new FileReader(file));
-        ClashConfigure result = new ClashConfigure();
+        FileInputStream inputStream = new FileInputStream(file);
+        Constructor constructor = new Constructor(ClashConfigure.class);
 
-        result.portHttp = validPortOrNull(valueOfOrNull(root.get("port")));
-        result.portSocks = validPortOrNull(valueOfOrNull(root.get("socks-port")));
-        result.portRedirect = validPortOrNull(valueOfOrNull(root.get("redir-port")));
+        constructor.setPropertyUtils(new PropertyUtils() {
+            {
+                setSkipMissingProperties(true);
+            }
 
-        Map dns = (Map) root.get("dns");
-        if ( dns != null && (boolean) dns.get("enable") && dns.containsKey("listen") ) {
-            result.portDns = validPortOrNull(String.valueOf(dns.get("listen")).split(":")[1]);
-        }
+            @Override
+            public Property getProperty(Class<?> type, String name) {
+                switch (name) {
+                    case "port":
+                        name = "portHttp";
+                        break;
+                    case "socks-port":
+                        name = "portSocks";
+                        break;
+                    case "redir-port":
+                        name = "portRedirect";
+                        break;
+                }
+                return super.getProperty(type, name);
+            }
+        });
+
+        ClashConfigure result = new Yaml(constructor).loadAs(inputStream, ClashConfigure.class);
+
+        inputStream.close();
 
         return result;
     }
 
-    private static String valueOfOrNull(Object object) {
-        if ( object == null )
-            return null;
-        return String.valueOf(object);
-    }
-
-    private static String validPortOrNull(String data) {
-        if ( data == null )
-            return null;
-
-        if ( Integer.parseInt(data) <= 1024)
-            return null;
-
-        return data;
+    static class Dns {
+        boolean enable;
+        String listen;
     }
 }
