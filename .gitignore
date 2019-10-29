@@ -24,9 +24,11 @@ gradle-app.setting
 
 # gradle
 .gradle
+.gogradle
 
 # clion cmake build
 cmake-build-*
+.externalNativeBuild
 
 # local properties
 local.properties

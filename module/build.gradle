@@ -1,15 +1,9 @@
 apply plugin: 'java'
-apply plugin: 'rirutools.ndk'
 apply plugin: 'rirutools.dex'
 apply plugin: 'rirutools.magisk'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
-ndk {
-    abiFilters = ["arm64-v8a"]
-    sourceDir = "src/main/cpp"
-}
 
 dex {
     platform = "android-29"
@@ -31,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    compile "org.yaml:snakeyaml:1.25-SNAPSHOT"
+
 }
 
 jar {
@@ -59,5 +53,3 @@ task setupMagiskFiles(type: Copy) {
     }
 }
 
-setupMagiskFiles.dependsOn(ndkBuild)
-magiskModule.dependsOn(setupMagiskFiles)
