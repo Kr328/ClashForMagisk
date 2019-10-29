@@ -26,10 +26,9 @@ In data directory
 
 * Clash configure file `config.yaml`
 * Clash GEOIP database `Country.mmdb`
-* Clash starter configure file `starter.yaml`
+* Clash starter configure file `starter.yaml` \[[example](https://github.com/Kr328/ClashForMagisk/blob/master/module/src/main/raw/magisk/core/starter.yaml)\]
 * Clash status file `RUNNING` or `STOPPED`
 * Custom proxy mode directory `mode.d`
-
 
 
 ## Control

@@ -23,8 +23,6 @@ public class Starter {
     private void exec() {
         //noinspection ResultOfMethodCallIgnored
         new File(dataDir).mkdirs();
-
-        AtomicBoolean restart = new AtomicBoolean(false);
         
         ProxySetup proxySetup = new ProxySetup(baseDir, dataDir);
 
@@ -64,7 +62,7 @@ public class Starter {
 
                 try {
                     proxySetup.execOnStop(starter, clash);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     Log.w(Constants.TAG, "Run stop script failure " + e.getMessage());
                 }
 
@@ -74,14 +72,11 @@ public class Starter {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-                if ( restart.getAndSet(false) ) {
-                    runner.start();
-                }
             }
         });
 
         ControlObserver observer = new ControlObserver(dataDir, type -> {
+            Utils.deleteFiles(dataDir, "STOP", "START", "RESTART");
             switch (type) {
                 case "START":
                     runner.start();
@@ -90,8 +85,7 @@ public class Starter {
                     runner.stop();
                     break;
                 case "RESTART":
-                    restart.set(true);
-                    runner.stop();
+                    runner.restart();
                     break;
            }
         });

@@ -50,7 +50,7 @@ task setupMagiskFiles(type: Copy) {
         def clashCommitId = 'git rev-parse --short HEAD'.execute([], new File(buildDir, "intermediate/cmake/arm64-v8a/clash-build")).text.trim()
         def clashCommitCount = Integer.parseInt('git rev-list --count HEAD'.execute([], new File(buildDir, "intermediate/cmake/arm64-v8a/clash-build")).text.trim())
 
-        def version = "$clashCommitId"
+        def version = "$clashCommitId-$moduleCommitCount"
         def versionCode = "$clashCommitCount$moduleCommitCount"
 
         def file = new File(buildDir, "intermediate/magisk/module.prop")

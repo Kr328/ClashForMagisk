@@ -11,6 +11,7 @@
 # - CLASH_DNS_PORT: clash dns port
 # - CLASH_UID: clash runing uid
 # - CLASH_GID: clash running gid
+# - PROXY_BLACKLIST_UID: blacklist uid
 #
 
 assert() {

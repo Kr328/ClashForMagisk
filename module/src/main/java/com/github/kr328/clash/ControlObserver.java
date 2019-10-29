@@ -44,11 +44,12 @@ public class ControlObserver {
                     restart();
                 }
                 else {
-                    switch (file.toUpperCase()) {
+                    file = file.toUpperCase();
+
+                    switch (file) {
                         case "STOP":
                         case "START":
                         case "RESTART":
-                            Utils.deleteFiles(dataDir.getAbsolutePath(), "STOP", "START", "RESTART");
                             callback.onUserControl(file);
                         }
                 }

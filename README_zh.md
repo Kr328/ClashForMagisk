@@ -28,7 +28,7 @@ A rule-based tunnel in Go. This module is wrapper for [clash](https://github.com
 
 * Clash 配置文件 `config.yaml`
 * Clash GEOIP 数据库 `Country.mmdb`
-* Clash 启动器 配置文件  `starter.yaml`
+* Clash 启动器 配置文件  `starter.yaml` \[[样例](https://github.com/Kr328/ClashForMagisk/blob/master/module/src/main/raw/magisk/core/starter.yaml)\]
 * Clash 状态文件 `RUNNING` 或者 `STOPPED`
 
 

@@ -27,7 +27,7 @@ class ProxySetup {
         if (!script.exists())
             script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-prepare.sh");
         if (!script.exists()) {
-            Log.e(Constants.TAG, "Unsupported proxy mode " + starterConfigure.mode);
+            Log.w(Constants.TAG, "Ignore on-prepare.sh for " + starterConfigure.mode);
             return;
         }
 
@@ -55,7 +55,7 @@ class ProxySetup {
         if (!script.exists())
             script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-start.sh");
         if (!script.exists()) {
-            Log.e(Constants.TAG, "Unsupported proxy mode " + starterConfigure.mode);
+            Log.w(Constants.TAG, "Ignore on-start.sh for " + starterConfigure.mode);
             return;
         }
 
@@ -83,7 +83,7 @@ class ProxySetup {
         if (!script.exists())
             script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-stop.sh");
         if (!script.exists()) {
-            Log.e(Constants.TAG, "Unsupported proxy mode " + starterConfigure.mode);
+            Log.w(Constants.TAG, "Ignore on-stop.sh for " + starterConfigure.mode);
             return;
         }
 
