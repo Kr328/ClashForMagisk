@@ -59,15 +59,15 @@ task("build", type = Exec::class) {
                 }
             }.getProperty("ndk.dir") ?: throw IOException("ndk.dir not found in local.properties")
 
-            val compilerDir = file(ndk).resolve("toolchains/llvm/prebuilt/linux-x86_64/bin/")
+            val compilerDir = file(ndk).resolve("toolchains/llvm/prebuilt/${ndkHost()}/bin")
 
             environment.put("GOARCH", "arm64")
             environment.put("GOOS", "android")
             environment.put("CGO_ENABLED", "1")
             environment.put("GOPATH", buildDir.resolve("intermediate/gopath").absolutePath)
-            environment.put("CXX", compilerDir.resolve(Clang.COMPILER_PREFIX + "clang++".exe()))
-            environment.put("CC", compilerDir.resolve(Clang.COMPILER_PREFIX + "clang".exe()))
-            environment.put("LD", compilerDir.resolve(Clang.LD_PREFIX + "ld".exe()))
+            environment.put("CXX", compilerDir.resolve(Clang.COMPILER_PREFIX + "clang++".exe()).absolutePath)
+            environment.put("CC", compilerDir.resolve(Clang.COMPILER_PREFIX + "clang".exe()).absolutePath)
+            environment.put("LD", compilerDir.resolve(Clang.LD_PREFIX + "ld".exe()).absolutePath)
         } catch (e: IOException) {
             throw GradleScriptException("Unable to create build environment", e)
         }
