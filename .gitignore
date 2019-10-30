@@ -29,6 +29,7 @@ gradle-app.setting
 # clion cmake build
 cmake-build-*
 .externalNativeBuild
+.cxx
 
 # local properties
 local.properties
