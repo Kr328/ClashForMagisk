@@ -4,7 +4,6 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Starter {
     private String baseDir;
@@ -15,6 +14,20 @@ public class Starter {
         this.dataDir = dataDir;
     }
 
+    public static void main(String[] args) {
+        if (args.length != 2) {
+            System.err.println("Usage: app_process /system/bin com.github.kr328.clash.Starter [CORE-DIR] [DATA-DIR]");
+
+            System.exit(1);
+        }
+
+        Log.i(Constants.TAG, "Starter started");
+
+        Utils.waitForUserUnlocked();
+
+        new Starter(args[0], args[1]).exec();
+    }
+
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
@@ -23,7 +36,7 @@ public class Starter {
     private void exec() {
         //noinspection ResultOfMethodCallIgnored
         new File(dataDir).mkdirs();
-        
+
         ProxySetup proxySetup = new ProxySetup(baseDir, dataDir);
 
         ClashRunner runner = new ClashRunner(baseDir, dataDir, new ClashRunner.Callback() {
@@ -39,7 +52,7 @@ public class Starter {
             }
 
             @Override
-            public void onStarted(ClashRunner runner, StarterConfigure starter ,ClashConfigure clash) {
+            public void onStarted(ClashRunner runner, StarterConfigure starter, ClashConfigure clash) {
                 Utils.deleteFiles(dataDir, "RUNNING", "STOPPED");
 
                 try {
@@ -53,7 +66,8 @@ public class Starter {
                 try {
                     //noinspection ResultOfMethodCallIgnored
                     new File(dataDir, "RUNNING").createNewFile();
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
 
             @Override
@@ -87,7 +101,7 @@ public class Starter {
                 case "RESTART":
                     runner.restart();
                     break;
-           }
+            }
         });
 
         Utils.deleteFiles(dataDir, "RUNNING", "STOPPED");
@@ -106,21 +120,7 @@ public class Starter {
             synchronized (this) {
                 this.wait();
             }
+        } catch (InterruptedException ignored) {
         }
-        catch (InterruptedException ignored) {}
-    }
-
-    public static void main(String[] args) {
-        if ( args.length != 2 ) {
-            System.err.println("Usage: app_process /system/bin com.github.kr328.clash.Starter [CORE-DIR] [DATA-DIR]");
-
-            System.exit(1);
-        }
-
-        Log.i(Constants.TAG, "Starter started");
-
-        Utils.waitForUserUnlocked();
-
-        new Starter(args[0], args[1]).exec();
     }
 }

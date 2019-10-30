@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
 class ProxySetup {
@@ -142,14 +141,14 @@ class ProxySetup {
         IPackageManager pm = IPackageManager.Stub.asInterface(ServiceManager.getService("package"));
         StringBuilder result = new StringBuilder();
 
-        for ( String line : starterConfigure.blacklist ) {
+        for (String line : starterConfigure.blacklist) {
             String[] split = line.split(":");
 
             switch (split[0]) {
                 case "package":
                     PackageInfo packageInfo =
                             pm.getPackageInfo(split[1], 0, split.length == 3 ? Integer.parseInt(split[2]) : 0);
-                    if ( packageInfo == null ) {
+                    if (packageInfo == null) {
                         Log.w(Constants.TAG, "Package " + split[1] + " not found. Ignore.");
                         break;
                     }
@@ -160,7 +159,7 @@ class ProxySetup {
                     break;
                 case "user":
                     int uid = android.os.Process.getUidForName(split[1]);
-                    if ( uid < 0 ) {
+                    if (uid < 0) {
                         Log.w(Constants.TAG, "Invalid user " + split[1] + ". Ignore.");
                         break;
                     }

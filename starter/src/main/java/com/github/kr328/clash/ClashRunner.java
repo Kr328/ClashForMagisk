@@ -1,9 +1,14 @@
 package com.github.kr328.clash;
 
 import android.util.Log;
+
 import org.yaml.snakeyaml.error.YAMLException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 
 class ClashRunner {
@@ -15,6 +20,7 @@ class ClashRunner {
     private ClashConfigure clashConfigure;
     private int pid;
     private boolean restart;
+
     ClashRunner(String baseDir, String dataDir, Callback callback) {
         this.baseDir = baseDir;
         this.dataDir = dataDir;
@@ -88,7 +94,7 @@ class ClashRunner {
 
                         callback.onStopped(this, starterConfigure, clashConfigure);
 
-                        if ( restart ) {
+                        if (restart) {
                             restart = false;
                             this.start();
                         }

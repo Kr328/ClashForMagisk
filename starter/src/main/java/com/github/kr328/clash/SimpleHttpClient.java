@@ -13,7 +13,7 @@ public class SimpleHttpClient {
         connection.setInstanceFollowRedirects(true);
         connection.connect();
 
-        if ( connection.getResponseCode() / 100 != 2 ) {
+        if (connection.getResponseCode() / 100 != 2) {
             connection.disconnect();
             return null;
         }
@@ -22,7 +22,7 @@ public class SimpleHttpClient {
         StringBuilder stringBuilder = new StringBuilder();
         String line;
 
-        while (( line = reader.readLine() ) != null )
+        while ((line = reader.readLine()) != null)
             stringBuilder.append(line);
 
         connection.disconnect();

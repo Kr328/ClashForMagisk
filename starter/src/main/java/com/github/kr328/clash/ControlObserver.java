@@ -6,14 +6,9 @@ import android.util.Log;
 import java.io.File;
 
 public class ControlObserver {
-    public interface Callback {
-        void onUserControl(String type);
-    }
-
     private Callback callback;
     private File dataDir;
     private FileObserver fileObserver;
-
     ControlObserver(String data, Callback callback) {
         this.dataDir = new File(data);
         this.callback = callback;
@@ -23,7 +18,7 @@ public class ControlObserver {
     protected void finalize() throws Throwable {
         super.finalize();
 
-        if ( fileObserver != null )
+        if (fileObserver != null)
             fileObserver.stopWatching();
     }
 
@@ -35,15 +30,14 @@ public class ControlObserver {
         //noinspection ResultOfMethodCallIgnored
         dataDir.mkdirs();
 
-        fileObserver = new FileObserver(dataDir.getAbsolutePath(), FileObserver.CREATE | FileObserver.DELETE_SELF | FileObserver.MOVED_FROM | FileObserver.MOVED_TO ) {
+        fileObserver = new FileObserver(dataDir.getAbsolutePath(), FileObserver.CREATE | FileObserver.DELETE_SELF | FileObserver.MOVED_FROM | FileObserver.MOVED_TO) {
             @Override
             public void onEvent(int event, String file) {
                 Log.d(Constants.TAG, "Control Directory Changed " + file);
 
-                if (( event & FileObserver.DELETE_SELF ) != 0 ) {
+                if ((event & FileObserver.DELETE_SELF) != 0) {
                     restart();
-                }
-                else {
+                } else {
                     file = file.toUpperCase();
 
                     switch (file) {
@@ -51,11 +45,15 @@ public class ControlObserver {
                         case "START":
                         case "RESTART":
                             callback.onUserControl(file);
-                        }
+                    }
                 }
             }
         };
 
         fileObserver.startWatching();
+    }
+
+    public interface Callback {
+        void onUserControl(String type);
     }
 }
