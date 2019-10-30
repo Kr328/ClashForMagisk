@@ -39,7 +39,7 @@ fun String.execute(pwd: File): String {
             workingDir = pwd
             standardOutput = output
             errorOutput = output
-        }.assertNormalExitValue()
+        }
 
         output.toString("utf-8").trim()
     }
