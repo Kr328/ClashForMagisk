@@ -41,7 +41,7 @@ fun String.execute(pwd: File): String {
             errorOutput = output
         }.assertNormalExitValue()
 
-        output.toString("utf-8")
+        output.toString("utf-8").trim()
     }
 }
 
@@ -55,10 +55,10 @@ task("setupMagiskFiles", type = Copy::class) {
     into("$buildDir/intermediate/magisk/")
 
     doLast {
-        val moduleCommitCount = Integer.parseInt("git rev-list --count HEAD || echo -1".execute(rootProject.rootDir).trim())
+        val moduleCommitCount = Integer.parseInt("git rev-list --count HEAD || echo -1".execute(rootProject.rootDir))
 
-        val clashCommitId = "git rev-parse --short HEAD || echo unknown".execute(project(":clash").file("src/main/golang/clash/")).trim()
-        val clashCommitCount = Integer.parseInt("git rev-list --count HEAD || echo -1".execute(project(":clash").file("src/main/golang/clash/")).trim())
+        val clashCommitId = "git rev-parse --short HEAD || echo unknown".execute(project(":clash").file("src/main/golang/clash/"))
+        val clashCommitCount = Integer.parseInt("git rev-list --count HEAD || echo -1".execute(project(":clash").file("src/main/golang/clash/")))
 
         val version = "$clashCommitId-$moduleCommitCount"
         val versionCode = "$clashCommitCount$moduleCommitCount"

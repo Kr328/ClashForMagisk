@@ -30,9 +30,9 @@ fun String.execute(pwd: File): String {
             workingDir = pwd
             standardOutput = output
             errorOutput = output
-        }.assertNormalExitValue()
+        }
 
-        output.toString("utf-8")
+        output.toString("utf-8").trim()
     }
 }
 
@@ -64,7 +64,7 @@ task("build", type = Exec::class) {
             environment.put("GOARCH", "arm64")
             environment.put("GOOS", "android")
             environment.put("CGO_ENABLED", "1")
-            environment.put("GOPATH", file("$buildDir/intermediate/gopath/").absolutePath)
+            environment.put("GOPATH", buildDir.resolve("intermediate/gopath").absolutePath)
             environment.put("CXX", compilerDir.resolve(Clang.COMPILER_PREFIX + "clang++".exe()))
             environment.put("CC", compilerDir.resolve(Clang.COMPILER_PREFIX + "clang".exe()))
             environment.put("LD", compilerDir.resolve(Clang.LD_PREFIX + "ld".exe()))
@@ -85,6 +85,11 @@ task("build", type = Exec::class) {
         val current = "git rev-parse --short HEAD || echo unknown".execute(file("src/main/golang/clash"))
 
         buildDir.resolve("intermediate").apply(File::mkdirs).resolve("last_build_commit").writeText(current)
+
+        // Workaround for unable to clean gopath
+        if (Os.isFamily(Os.FAMILY_UNIX) || Os.isFamily(Os.FAMILY_MAC)) {
+            ("chmod -R 700 \"" + buildDir.resolve("intermediate/gopath").absolutePath + "\" || echo \"Change Permission Failure\"").execute(buildDir)
+        }
     }
 
     workingDir = file("src/main/golang/clash")
