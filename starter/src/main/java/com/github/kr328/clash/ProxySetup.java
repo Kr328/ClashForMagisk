@@ -1,9 +1,5 @@
 package com.github.kr328.clash;
 
-import android.content.pm.IPackageManager;
-import android.content.pm.PackageInfo;
-import android.os.RemoteException;
-import android.os.ServiceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -21,88 +17,60 @@ class ProxySetup {
         this.baseDir = baseDir;
     }
 
-    void execOnPrepare(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws Exception {
-        File script = new File(dataDir + "/mode.d/" + starterConfigure.mode + "/on-prepare.sh");
+    void execOnPrepare(CachedConfigure cachedConfigure) throws Exception {
+        File script = new File(dataDir + "/mode.d/" + cachedConfigure.starterConfigure.mode + "/on-prepare.sh");
         if (!script.exists())
-            script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-prepare.sh");
+            script = new File(baseDir + "/mode.d/" + cachedConfigure.starterConfigure.mode + "/on-prepare.sh");
         if (!script.exists()) {
-            Log.w(Constants.TAG, "Ignore on-prepare.sh for " + starterConfigure.mode);
+            Log.w(Constants.TAG, "Ignore on-prepare.sh for " + cachedConfigure.starterConfigure.mode);
             return;
         }
 
-        HashMap<String, String> env = new HashMap<>();
-
-        if (clashConfigure.portHttp != null)
-            env.put("CLASH_HTTP_PORT", clashConfigure.portHttp);
-        if (clashConfigure.portSocks != null)
-            env.put("CLASH_SOCKS_PORT", clashConfigure.portSocks);
-        if (clashConfigure.portRedirect != null)
-            env.put("CLASH_REDIR_PORT", clashConfigure.portRedirect);
-        if (clashConfigure.dns != null && clashConfigure.dns.enable && clashConfigure.dns.listen != null)
-            env.put("CLASH_DNS_PORT", clashConfigure.dns.listen.split(":")[1]);
-        if (starterConfigure.blacklist != null)
-            env.put("PROXY_BLACKLIST_UID", buildUidList(starterConfigure));
-
-        env.put("CLASH_UID", Constants.CLASH_UID);
-        env.put("CLASH_GID", Constants.CLASH_GID);
-
-        exec("sh " + script.getAbsolutePath(), env);
+        execScript(cachedConfigure, script.getAbsolutePath());
     }
 
-    void execOnStarted(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws Exception {
-        File script = new File(dataDir + "/mode.d/" + starterConfigure.mode + "/on-start.sh");
+    void execOnStarted(CachedConfigure cachedConfigure) throws Exception {
+        File script = new File(dataDir + "/mode.d/" + cachedConfigure.starterConfigure.mode + "/on-start.sh");
         if (!script.exists())
-            script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-start.sh");
+            script = new File(baseDir + "/mode.d/" + cachedConfigure.starterConfigure.mode + "/on-start.sh");
         if (!script.exists()) {
-            Log.w(Constants.TAG, "Ignore on-start.sh for " + starterConfigure.mode);
+            Log.w(Constants.TAG, "Ignore on-start.sh for " + cachedConfigure.starterConfigure.mode);
             return;
         }
 
-        HashMap<String, String> env = new HashMap<>();
-
-        if (clashConfigure.portHttp != null)
-            env.put("CLASH_HTTP_PORT", clashConfigure.portHttp);
-        if (clashConfigure.portSocks != null)
-            env.put("CLASH_SOCKS_PORT", clashConfigure.portSocks);
-        if (clashConfigure.portRedirect != null)
-            env.put("CLASH_REDIR_PORT", clashConfigure.portRedirect);
-        if (clashConfigure.dns != null && clashConfigure.dns.enable && clashConfigure.dns.listen != null)
-            env.put("CLASH_DNS_PORT", clashConfigure.dns.listen.split(":")[1]);
-        if (starterConfigure.blacklist != null)
-            env.put("PROXY_BLACKLIST_UID", buildUidList(starterConfigure));
-
-        env.put("CLASH_UID", Constants.CLASH_UID);
-        env.put("CLASH_GID", Constants.CLASH_GID);
-
-        exec("sh " + script.getAbsolutePath(), env);
+        execScript(cachedConfigure, script.getAbsolutePath());
     }
 
-    void execOnStop(StarterConfigure starterConfigure, ClashConfigure clashConfigure) throws Exception {
-        File script = new File(dataDir + "/mode.d/" + starterConfigure.mode + "/on-stop.sh");
+    void execOnStop(CachedConfigure cachedConfigure) throws Exception {
+        File script = new File(dataDir + "/mode.d/" + cachedConfigure.starterConfigure.mode + "/on-stop.sh");
         if (!script.exists())
-            script = new File(baseDir + "/mode.d/" + starterConfigure.mode + "/on-stop.sh");
+            script = new File(baseDir + "/mode.d/" + cachedConfigure.starterConfigure.mode + "/on-stop.sh");
         if (!script.exists()) {
-            Log.w(Constants.TAG, "Ignore on-stop.sh for " + starterConfigure.mode);
+            Log.w(Constants.TAG, "Ignore on-stop.sh for " + cachedConfigure.starterConfigure.mode);
             return;
         }
 
+        execScript(cachedConfigure, script.getAbsolutePath());
+    }
+
+    private void execScript(CachedConfigure cachedConfigure, String script) throws IOException {
         HashMap<String, String> env = new HashMap<>();
 
-        if (clashConfigure.portHttp != null)
-            env.put("CLASH_HTTP_PORT", clashConfigure.portHttp);
-        if (clashConfigure.portSocks != null)
-            env.put("CLASH_SOCKS_PORT", clashConfigure.portSocks);
-        if (clashConfigure.portRedirect != null)
-            env.put("CLASH_REDIR_PORT", clashConfigure.portRedirect);
-        if (clashConfigure.dns != null && clashConfigure.dns.enable && clashConfigure.dns.listen != null)
-            env.put("CLASH_DNS_PORT", clashConfigure.dns.listen.split(":")[1]);
-        if (starterConfigure.blacklist != null)
-            env.put("PROXY_BLACKLIST_UID", buildUidList(starterConfigure));
+        if (cachedConfigure.clashConfigure.portHttp != null)
+            env.put("CLASH_HTTP_PORT", cachedConfigure.clashConfigure.portHttp);
+        if (cachedConfigure.clashConfigure.portSocks != null)
+            env.put("CLASH_SOCKS_PORT", cachedConfigure.clashConfigure.portSocks);
+        if (cachedConfigure.clashConfigure.portRedirect != null)
+            env.put("CLASH_REDIR_PORT", cachedConfigure.clashConfigure.portRedirect);
+        if (cachedConfigure.clashConfigure.dns.enable && cachedConfigure.clashConfigure.dns.listen != null)
+            env.put("CLASH_DNS_PORT", cachedConfigure.clashConfigure.dns.listen.split(":")[1]);
+        if (cachedConfigure.starterConfigure.blacklist != null)
+            env.put("PROXY_BLACKLIST_UID", buildUidList(cachedConfigure));
 
         env.put("CLASH_UID", Constants.CLASH_UID);
         env.put("CLASH_GID", Constants.CLASH_GID);
 
-        exec("sh " + script.getAbsolutePath(), env);
+        exec("sh " + script, env);
     }
 
     private void exec(String command, HashMap<String, String> env) throws IOException {
@@ -134,40 +102,15 @@ class ProxySetup {
             throw new IOException("Mode setup script exec failure");
 
         process.destroy();
-        process.destroyForcibly();
     }
 
-    private String buildUidList(StarterConfigure starterConfigure) throws RemoteException {
-        IPackageManager pm = IPackageManager.Stub.asInterface(ServiceManager.getService("package"));
-        StringBuilder result = new StringBuilder();
+    private String buildUidList(CachedConfigure cachedConfigure) {
+        StringBuilder sb = new StringBuilder();
 
-        for (String line : starterConfigure.blacklist) {
-            String[] split = line.split(":");
-
-            switch (split[0]) {
-                case "package":
-                    PackageInfo packageInfo =
-                            pm.getPackageInfo(split[1], 0, split.length == 3 ? Integer.parseInt(split[2]) : 0);
-                    if (packageInfo == null) {
-                        Log.w(Constants.TAG, "Package " + split[1] + " not found. Ignore.");
-                        break;
-                    }
-                    result.append(packageInfo.applicationInfo.uid).append(' ');
-                    break;
-                case "uid":
-                    result.append(split[1]).append(' ');
-                    break;
-                case "user":
-                    int uid = android.os.Process.getUidForName(split[1]);
-                    if (uid < 0) {
-                        Log.w(Constants.TAG, "Invalid user " + split[1] + ". Ignore.");
-                        break;
-                    }
-                    result.append(uid).append(' ');
-                    break;
-            }
+        for (int uid : cachedConfigure.blacklist) {
+            sb.append(uid).append(' ');
         }
 
-        return result.toString();
+        return sb.toString().trim();
     }
 }

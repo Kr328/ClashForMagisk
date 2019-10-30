@@ -10,7 +10,7 @@ magisk {
     output = "$buildDir/outputs/clash-for-magisk.zip"
     
     zip.map(buildDir.resolve("intermediate/magisk/"), "/")
-    zip.map(buildDir.resolve("intermediate/starter/classes.dex"), "/core/starter.jar")
+    zip.map(buildDir.resolve("intermediate/starter/classes.dex"), "/core/starter.dex")
     zip.map(buildDir.resolve("intermediate/starter/lib/arm64-v8a/libsetuidgid.so"), "/core/setuidgid")
     zip.map(buildDir.resolve("intermediate/starter/lib/arm64-v8a/libdaemonize.so"), "/core/daemonize")
     zip.map(project(":clash").buildDir.resolve("outputs/clash"), "/core/clash")
@@ -76,5 +76,8 @@ project(":starter").tasks.whenTaskAdded {
 }
 
 afterEvaluate {
-    tasks.getByName("magiskModule").dependsOn(tasks.getByName("setupMagiskFiles"), tasks.getByName("extractStarter"))
+    tasks.getByName("magiskModule").dependsOn(
+            tasks.getByName("setupMagiskFiles"),
+            tasks.getByName("extractStarter"),
+            project(":clash").tasks.getByName("build"))
 }

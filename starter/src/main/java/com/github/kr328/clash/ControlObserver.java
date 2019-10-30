@@ -9,6 +9,7 @@ public class ControlObserver {
     private Callback callback;
     private File dataDir;
     private FileObserver fileObserver;
+
     ControlObserver(String data, Callback callback) {
         this.dataDir = new File(data);
         this.callback = callback;

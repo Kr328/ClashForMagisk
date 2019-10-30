@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Objects;
 import java.util.regex.Matcher;
 
 class ClashRunner {
@@ -16,8 +17,7 @@ class ClashRunner {
     private String dataDir;
     private Process process;
     private Callback callback;
-    private StarterConfigure starterConfigure;
-    private ClashConfigure clashConfigure;
+    private CachedConfigure cachedConfigure;
     private int pid;
     private boolean restart;
 
@@ -33,7 +33,8 @@ class ClashRunner {
 
         try {
             try {
-                starterConfigure = StarterConfigure.loadFromFile(new File(dataDir + "/starter.yaml"));
+                StarterConfigure starterConfigure = StarterConfigure.loadFromFile(new File(dataDir + "/starter.yaml"));
+                ClashConfigure clashConfigure;
 
                 if (new File(dataDir + "/config.yaml").exists()) {
                     clashConfigure = ClashConfigure.loadFromFile(new File(dataDir + "/config.yaml"));
@@ -42,13 +43,15 @@ class ClashRunner {
                 } else {
                     throw new FileNotFoundException("Clash config file not found");
                 }
+
+                cachedConfigure = new CachedConfigure(starterConfigure, clashConfigure);
             } catch (IOException | YAMLException e) {
                 Log.e(Constants.TAG, "Unable to start clash", e);
                 restart = false;
                 return;
             }
 
-            if (callback.onPrepare(this, starterConfigure, clashConfigure)) {
+            if (callback.onPrepare(this, cachedConfigure)) {
                 restart = false;
                 return;
             }
@@ -76,13 +79,13 @@ class ClashRunner {
                     while ((line = reader.readLine()) != null) {
                         Matcher matcher = Constants.PATTERN_CLASH_PID.matcher(line);
                         if (matcher.matches()) {
-                            pid = Integer.parseInt(matcher.group(1));
+                            pid = Integer.parseInt(Objects.requireNonNull(matcher.group(1)));
                             break;
                         }
                     }
 
                     Log.i(Constants.TAG, "Clash started");
-                    callback.onStarted(this, starterConfigure, clashConfigure);
+                    callback.onStarted(this, cachedConfigure);
 
                     while ((line = reader.readLine()) != null)
                         Log.i(Constants.TAG, line);
@@ -92,7 +95,7 @@ class ClashRunner {
                     synchronized (ClashRunner.this) {
                         process = null;
 
-                        callback.onStopped(this, starterConfigure, clashConfigure);
+                        callback.onStopped(this, cachedConfigure);
 
                         if (restart) {
                             restart = false;
@@ -129,10 +132,10 @@ class ClashRunner {
     }
 
     interface Callback {
-        boolean onPrepare(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
+        boolean onPrepare(ClashRunner runner, CachedConfigure cachedConfigure);
 
-        void onStarted(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
+        void onStarted(ClashRunner runner, CachedConfigure cachedConfigure);
 
-        void onStopped(ClashRunner runner, StarterConfigure starter, ClashConfigure clash);
+        void onStopped(ClashRunner runner, CachedConfigure cachedConfigure);
     }
 }

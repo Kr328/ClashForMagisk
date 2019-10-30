@@ -13,7 +13,7 @@ class ClashConfigure {
     String portHttp;
     String portSocks;
     String portRedirect;
-    Dns dns;
+    Dns dns = new Dns();
 
     static ClashConfigure loadFromFile(File file) throws IOException {
         FileInputStream inputStream = new FileInputStream(file);

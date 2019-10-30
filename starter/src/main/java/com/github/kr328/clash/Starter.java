@@ -41,9 +41,9 @@ public class Starter {
 
         ClashRunner runner = new ClashRunner(baseDir, dataDir, new ClashRunner.Callback() {
             @Override
-            public boolean onPrepare(ClashRunner runner, StarterConfigure starter, ClashConfigure clash) {
+            public boolean onPrepare(ClashRunner runner, CachedConfigure cachedConfigure) {
                 try {
-                    proxySetup.execOnPrepare(starter, clash);
+                    proxySetup.execOnPrepare(cachedConfigure);
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "Run prepare script failure " + e.getMessage());
                     return true; // blocking start
@@ -52,11 +52,11 @@ public class Starter {
             }
 
             @Override
-            public void onStarted(ClashRunner runner, StarterConfigure starter, ClashConfigure clash) {
+            public void onStarted(ClashRunner runner, CachedConfigure cachedConfigure) {
                 Utils.deleteFiles(dataDir, "RUNNING", "STOPPED");
 
                 try {
-                    proxySetup.execOnStarted(starter, clash);
+                    proxySetup.execOnStarted(cachedConfigure);
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "Run start script failure " + e.getMessage());
                     runner.stop();
@@ -71,11 +71,11 @@ public class Starter {
             }
 
             @Override
-            public void onStopped(ClashRunner runner, StarterConfigure starter, ClashConfigure clash) {
+            public void onStopped(ClashRunner runner, CachedConfigure cachedConfigure) {
                 Utils.deleteFiles(dataDir, "RUNNING", "STOPPED");
 
                 try {
-                    proxySetup.execOnStop(starter, clash);
+                    proxySetup.execOnStop(cachedConfigure);
                 } catch (Exception e) {
                     Log.w(Constants.TAG, "Run stop script failure " + e.getMessage());
                 }

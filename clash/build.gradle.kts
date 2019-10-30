@@ -2,12 +2,13 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 import java.io.FileReader
 import java.io.IOException
+import java.text.SimpleDateFormat
 import java.util.*
 
 // Full custom build for clash
 
 object Clang {
-    const val COMPILER_PREFIX = "aarch64-linux-android23-"
+    const val COMPILER_PREFIX = "aarch64-linux-android21-"
     const val LD_PREFIX = "aarch64-linux-android-"
 }
 
@@ -43,6 +44,11 @@ fun ndkHost(): String {
         else -> throw GradleScriptException("Unsupported Build OS ${System.getenv("os.name")}", IOException())
     }
 }
+
+fun clashVersion(): String =
+        "git describe --tags || echo \"unknown version\"".execute(file("src/main/golang/clash"))
+fun buildTime(): String =
+        SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
 
 task("build", type = Exec::class) {
     doFirst {
@@ -82,7 +88,11 @@ task("build", type = Exec::class) {
     }
 
     workingDir = file("src/main/golang/clash")
-    commandLine = listOf("go".exe(), "build", "-o", file("$buildDir/outputs/clash").absolutePath)
+    commandLine = listOf("go".exe(), "build", "-ldflags", "-X \"github.com/Dreamacro/clash/constant.Version=${clashVersion()}\" -X \"github.com/Dreamacro/clash/constant.BuildTime=${buildTime()}\" -w -s", "-o", file("$buildDir/outputs/clash").absolutePath)
     standardOutput = System.out
     errorOutput = System.err
+}
+
+task("clean", type = Delete::class) {
+    delete = setOf(buildDir)
 }
