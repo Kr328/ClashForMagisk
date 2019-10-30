@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.library")
+    id("com.android.application")
 }
 
 android {
@@ -21,7 +21,7 @@ android {
 
     buildTypes {
         maybeCreate("release").apply {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
@@ -38,6 +38,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":hideapi"))
+    compileOnly(project(":hideapi"))
     implementation("org.yaml:snakeyaml:1.25-SNAPSHOT")
 }

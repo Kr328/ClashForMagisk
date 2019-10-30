@@ -3,22 +3,16 @@ import java.io.ByteArrayOutputStream
 
 plugins {
     id("java")
-    id("rirutools.dex")
     id("rirutools.magisk")
-}
-
-dex {
-    platform = "android-29"
-    buildTools = "29.0.2"
 }
 
 magisk {
     output = "$buildDir/outputs/clash-for-magisk.zip"
     
     zip.map(buildDir.resolve("intermediate/magisk/"), "/")
-    zip.map(buildDir.resolve("outputs/dex/classes.jar"), "/core/starter.jar")
-    zip.map(buildDir.resolve("intermediate/starter/jni/arm64-v8a/libsetuidgid.so"), "/core/setuidgid")
-    zip.map(buildDir.resolve("intermediate/starter/jni/arm64-v8a/libdaemonize.so"), "/core/daemonize")
+    zip.map(buildDir.resolve("intermediate/starter/classes.dex"), "/core/starter.jar")
+    zip.map(buildDir.resolve("intermediate/starter/lib/arm64-v8a/libsetuidgid.so"), "/core/setuidgid")
+    zip.map(buildDir.resolve("intermediate/starter/lib/arm64-v8a/libdaemonize.so"), "/core/daemonize")
     zip.map(project(":clash").buildDir.resolve("outputs/clash"), "/core/clash")
 }
 
@@ -32,10 +26,6 @@ dependencies {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-tasks.getByName("jar", type = Jar::class) {
-    from(zipTree(buildDir.resolve("intermediate/starter/classes.jar")))
 }
 
 fun String.execute(pwd: File): String {
@@ -56,7 +46,7 @@ fun String.execute(pwd: File): String {
 }
 
 task("extractStarter", type = Copy::class) {
-    from(zipTree(project(":starter").buildDir.resolve("outputs/aar/starter-release.aar")))
+    from(zipTree(project(":starter").buildDir.resolve("outputs/apk/release/starter-release-unsigned.apk")))
     into(buildDir.resolve("intermediate/starter/"))
 }
 
@@ -80,12 +70,11 @@ task("setupMagiskFiles", type = Copy::class) {
     }
 }
 
-project(":starter").afterEvaluate {
-    project(":module").tasks.getByName("extractStarter").dependsOn(tasks.getByName("assemble"))
+project(":starter").tasks.whenTaskAdded {
+    if ( name.contains("assembleRelease") )
+        tasks.getByName("extractStarter").dependsOn(this)
 }
 
-project.afterEvaluate {
-    tasks.getByName("jar").dependsOn(tasks.getByName("extractStarter"))
-    tasks.getByName("magiskModule").dependsOn(tasks.getByName("setupMagiskFiles"))
+afterEvaluate {
+    tasks.getByName("magiskModule").dependsOn(tasks.getByName("setupMagiskFiles"), tasks.getByName("extractStarter"))
 }
-
