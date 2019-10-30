@@ -1,6 +1,6 @@
 # Clash for Magisk
 
-A rule-based tunnel in Go. This module is wrapper for [clash](https://github.com/Dreamacro/clash) 
+A rule-based tunnel in Go. 此模块为 [clash](https://github.com/Dreamacro/clash) 的壳
 
 [English](README.md)
 
@@ -78,21 +78,30 @@ A rule-based tunnel in Go. This module is wrapper for [clash](https://github.com
 
 ## 构建
 
-1. 安装 JDK ,Gradle ,Android SDK ,Android NDK  
+1. 安装 JDK, Android SDK, Android NDK, Go, Git
 
-2. 创建 `local.properties` 在工程根目录  
+2. 克隆仓库
+   ```bash
+   git clone https://github.com/Kr328/ClashForMagisk && cd ClashForMagisk
+   ```
+
+3. 初始化子仓库
+   ```bash
+   git submodule init
+   ```
+
+4. 创建 `local.properties` 在工程根目录  
    ```properties
    sdk.dir=/path/to/android-sdk
    ndk.dir=/path/to/android-ndk
-   cmake.dir=/path/to/android-cmake/*version*
    ```
 
-3. 运行命令  
+5. 运行命令  
    ```bash
    ./gradlew build
    ```
 
-4. 从 module/build/outputs 获取 clash-for-magisk.zip 
+6. 从 module/build/outputs 获取 clash-for-magisk.zip 
 
 ## 反馈
 

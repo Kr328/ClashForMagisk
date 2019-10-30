@@ -75,18 +75,29 @@ Custom Mode Directory `{InternalStorage}/Android/data/com.github.kr328.clash/mod
 
 ## Build
 
-1. Install JDK ,Gradle ,Android SDK ,Android NDK  
+1. Install JDK, Android SDK, Android NDK, Go, Git   
 
-2. Create `local.properties` on project root directory  
+2. Clone repo
+   
+   ```bash
+   git clone https://github.com/Kr328/ClashForMagisk && cd ClashForMagisk
+   ```
+
+3. Initialize git submodule
+
+   ```bash
+   git submodule init
+   ```
+
+4. Create `local.properties` on project root directory  
    ```properties
    sdk.dir=/path/to/android-sdk
    ndk.dir=/path/to/android-ndk
-   cmake.dir=/path/to/android-cmake/*version*
    ```
 
-3. Run command   
+5. Run command   
    ```bash
    ./gradlew build
    ```
 
-4. Pick clash-for-magisk.zip from module/build/outputs  
+6. Get clash-for-magisk.zip on module/build/outputs  
