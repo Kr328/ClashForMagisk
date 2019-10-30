@@ -6,6 +6,10 @@ golang {
     packagePath = "github.com/Dreamacro/clash"
 }
 
+goBuild {
+    targetPlatform = ["android-arm64"]
+}
+
 dependencies {
     golang {
         build name: 'github.com/Dreamacro/clash', branch: 'dev'
