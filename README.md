@@ -87,6 +87,7 @@ Custom Mode Directory `{InternalStorage}/Android/data/com.github.kr328.clash/mod
 
    ```bash
    git submodule init
+   git submodule upate
    ```
 
 4. Create `local.properties` on project root directory  

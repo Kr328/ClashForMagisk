@@ -1,14 +1,9 @@
 package com.github.kr328.clash;
 
 import android.util.Log;
-
 import org.yaml.snakeyaml.error.YAMLException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Objects;
 import java.util.regex.Matcher;
 

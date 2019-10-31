@@ -23,8 +23,6 @@ public class Starter {
 
         Log.i(Constants.TAG, "Starter started");
 
-        Utils.waitForUserUnlocked();
-
         new Starter(args[0], args[1]).exec();
     }
 
