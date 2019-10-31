@@ -7,7 +7,7 @@ import org.yaml.snakeyaml.introspector.PropertyUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 class StarterConfigure {
     String mode;
@@ -30,4 +30,38 @@ class StarterConfigure {
         return result;
     }
 
+    static StarterConfigure defaultValue() {
+        StarterConfigure result = new StarterConfigure();
+
+        result.mode = "redirect";
+        result.blacklist = Arrays.asList("package:com.github.shadowsocks",
+                "package:com.github.shadowsocks:1000",
+                "user:system",
+                "uid:1000");
+
+        return result;
+    }
+
+    Map<String, Map> replaceList() {
+        HashMap<String, Map> result = new HashMap<>();
+
+        result.put("%%MODE%%", modeMap());
+        result.put("%%BLACKLIST%%", blacklistMap());
+
+        return result;
+    }
+
+    private Map<String, String> modeMap() {
+        return new HashMap<String, String>() {
+            {
+                put("mode", mode);
+            }
+        };
+    }
+
+    private Map<String, List<String>> blacklistMap() {
+        return new HashMap<String, List<String>>() {{
+            put("blacklist", blacklist);
+        }};
+    }
 }

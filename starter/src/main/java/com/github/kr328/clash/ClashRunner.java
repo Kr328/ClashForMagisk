@@ -33,9 +33,9 @@ class ClashRunner {
 
         try {
             try {
-                StarterConfigure starterConfigure = StarterConfigure.loadFromFile(new File(dataDir + "/starter.yaml"));
-                ClashConfigure clashConfigure;
+                StarterConfigure starterConfigure = Utils.loadOrRenderStarter(baseDir, dataDir);
 
+                ClashConfigure clashConfigure;
                 if (new File(dataDir + "/config.yaml").exists()) {
                     clashConfigure = ClashConfigure.loadFromFile(new File(dataDir + "/config.yaml"));
                 } else if (new File(dataDir + "/config.yml").exists()) {

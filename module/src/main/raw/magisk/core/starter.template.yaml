@@ -1,0 +1,20 @@
+# Clash for Magisk Starter configure
+
+# Proxy mode
+# proxy setup script in mode.d/{mode}
+# 
+# built-in mode
+#  - redirect 
+#  - proxy-only
+#
+
+%%MODE%%
+
+# Blacklist
+# list of bypass proxy applications
+#
+# line format
+# type:target:extra
+
+%%BLACKLIST%%
+

@@ -41,3 +41,7 @@ dependencies {
     compileOnly(project(":hideapi"))
     implementation("org.yaml:snakeyaml:1.25-SNAPSHOT")
 }
+
+tasks.getByName("clean", type = Delete::class) {
+    delete += setOf(file(".cxx"), file(".externalNativeBuild"))
+}

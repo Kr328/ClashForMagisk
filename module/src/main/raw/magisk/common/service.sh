@@ -24,8 +24,4 @@ done
 
 mkdir -p "$DATA_DIR"
 
-if [[ ! -f "$DATA_DIR/starter.yaml" ]];then
-    cp "$CORE_DIR/starter.yaml" "$DATA_DIR/starter.yaml"
-fi
-
 CLASSPATH="$CORE_DIR/starter.dex" ${CORE_DIR}/daemonize /system/bin/app_process /system/bin --nice-name=clash_starter com.github.kr328.clash.Starter "$CORE_DIR" "$DATA_DIR"
