@@ -1,12 +1,14 @@
 buildscript {
+    val kotlinVersion = "1.3.61"
+
     repositories {
         google()
         jcenter()
-        maven { url = java.net.URI("https://dl.bintray.com/kr328/riru-gradle-tools") }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.5.1")
-        classpath("com.github.kr328:riru-gradle-tools:1.0-alpha08")
+        classpath("com.android.tools.build:gradle:3.5.3")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath(kotlin("serialization", version = kotlinVersion))
     }
 }
 
@@ -14,8 +16,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
-        maven { url = java.net.URI("https://oss.sonatype.org/content/groups/public/") }
     }
 }
 

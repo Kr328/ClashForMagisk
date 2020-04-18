@@ -21,15 +21,3 @@
 #-renamesourcefileattribute SourceFile
 
 -dontobfuscate
--keep class com.github.kr328.clash.Starter {
-    public static void main(java.lang.String[]);
-}
--keep class com.github.kr328.clash.ClashConfigure {
-    *;
-}
--keep class com.github.kr328.clash.StarterConfigure {
-    *;
-}
--keep class com.github.kr328.clash.ClashConfigure.DNS {
-    *;
-}
