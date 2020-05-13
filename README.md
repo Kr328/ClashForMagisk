@@ -98,7 +98,7 @@ Custom Mode Directory `{InternalStorage}/Android/data/com.github.kr328.clash/mod
 
 5. Run command   
    ```bash
-   ./gradlew build
+   ./gradlew build --parallel
    ```
 
 6. Get clash-for-magisk.zip on module/build/outputs  

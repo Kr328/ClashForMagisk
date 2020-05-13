@@ -12,11 +12,21 @@ buildscript {
     }
 }
 
-allprojects {
+project(":module") {
+    dependencies {
+        project(":starter")
+        project(":clash")
+    }
+}
+
+project(":starter") {
     repositories {
         google()
         jcenter()
     }
+}
+
+project(":clash") {
 }
 
 task("clean", type = Delete::class) {

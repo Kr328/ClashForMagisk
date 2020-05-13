@@ -99,7 +99,7 @@ A rule-based tunnel in Go. 此模块为 [clash](https://github.com/Dreamacro/cla
 
 5. 运行命令  
    ```bash
-   ./gradlew build
+   ./gradlew build --parallel
    ```
 
 6. 从 module/build/outputs 获取 clash-for-magisk.zip 
