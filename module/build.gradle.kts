@@ -68,7 +68,12 @@ fun String.execute(pwd: File): String {
     }
 }
 
+task("build", type = DefaultTask::class) {}
+
 gradle.projectsEvaluated {
+    tasks.getByName("build").dependsOn(
+        tasks.getByName("magisk")
+    )
     tasks.getByName("magisk").dependsOn(
             project(":clash").tasks.getByName("build"),
             project(":starter").tasks.getByName("extractExecutable"),
