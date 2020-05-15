@@ -1,3 +1,4 @@
 [submodule "clash/src/main/golang/clash"]
 	path = clash/src/main/golang/clash
 	url = https://github.com/Dreamacro/clash
+	branch = master
