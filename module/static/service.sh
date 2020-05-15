@@ -24,8 +24,8 @@ done
 
 mkdir -p "$DATA_DIR"
 
-chmod 700 ${CORE_DIR}/daemonize
-chmod 700 ${CORE_DIR}/setuidgid
-chmod 700 ${CORE_DIR}/clash
+chmod 6700 ${CORE_DIR}/daemonize
+chmod 6700 ${CORE_DIR}/setuidgid
+chmod 6700 ${CORE_DIR}/clash
 
-CLASSPATH="$CORE_DIR/starter.jar" ${CORE_DIR}/daemonize /system/bin/app_process /system/bin --nice-name=clash_starter com.github.kr328.clash.Main "$CORE_DIR" "$DATA_DIR"
+CLASSPATH="$CORE_DIR/starter.jar" nohup /system/bin/app_process /system/bin --nice-name=clash_starter com.github.kr328.clash.Main "$CORE_DIR" "$DATA_DIR" > /dev/null 2>&1 &
