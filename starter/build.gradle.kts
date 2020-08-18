@@ -4,16 +4,17 @@ plugins {
     kotlin("plugin.serialization")
 }
 
-val kotlinVersion: String = "1.3.61"
-val jacksonVersion: String = "2.10.1"
+val kotlinVersion: String by project
+val kotlinSerializationVersion: String by project
+val kamlVersion: String by project
 
 android {
-    compileSdkVersion(29)
+    compileSdkVersion(30)
     buildToolsVersion = "29.0.3"
 
     defaultConfig {
-        minSdkVersion(23)
-        targetSdkVersion(29)
+        minSdkVersion(24)
+        targetSdkVersion(30)
         versionCode = 1
         versionName = "1.0"
 
@@ -25,7 +26,7 @@ android {
     }
 
     buildTypes {
-        maybeCreate("release").apply {
+        named("release") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
@@ -33,7 +34,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            setPath(file("src/main/cpp/CMakeLists.txt"))
+            path = file("src/main/cpp/CMakeLists.txt")
         }
     }
 
@@ -44,10 +45,11 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.3.0-alpha01")
+    compileOnly(project(":hideapi"))
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0")
-    implementation("com.charleskorn.kaml:kaml:0.15.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlinSerializationVersion")
+    implementation("com.charleskorn.kaml:kaml:$kamlVersion")
 }
 
 repositories {
@@ -82,10 +84,6 @@ task("extractExecutable", type = Copy::class) {
 afterEvaluate {
     val assembleRelease = tasks.getByName("assembleRelease")
 
-    val createStarterJar = tasks.getByName("createStarterJar").apply {
-        dependsOn += assembleRelease
-    }
-    val extractExecutable = tasks.getByName("extractExecutable").apply {
-        dependsOn += assembleRelease
-    }
+    tasks["createStarterJar"].dependsOn += assembleRelease
+    tasks["extractExecutable"].dependsOn += assembleRelease
 }

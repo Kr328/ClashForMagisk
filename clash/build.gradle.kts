@@ -7,18 +7,6 @@ import java.util.*
 
 // Full custom build for clash
 
-object Clang {
-    const val COMPILER_PREFIX = "aarch64-linux-android21-"
-    const val LD_PREFIX = "aarch64-linux-android-"
-}
-
-fun String.exe(): String {
-    return if ( Os.isFamily(Os.FAMILY_WINDOWS) )
-        "$this.exe"
-    else
-        this
-}
-
 fun String.execute(pwd: File): String {
     return ByteArrayOutputStream().use { output ->
         exec {
@@ -64,10 +52,7 @@ task("build", type = Exec::class) {
             environment.put("GOARCH", "arm64")
             environment.put("GOOS", "android")
             environment.put("CGO_ENABLED", "1")
-            environment.put("GOPATH", buildDir.resolve("intermediate/gopath").absolutePath)
-            environment.put("CXX", compilerDir.resolve(Clang.COMPILER_PREFIX + "clang++".exe()).absolutePath)
-            environment.put("CC", compilerDir.resolve(Clang.COMPILER_PREFIX + "clang".exe()).absolutePath)
-            environment.put("LD", compilerDir.resolve(Clang.LD_PREFIX + "ld".exe()).absolutePath)
+            environment.put("CC", compilerDir.resolve("aarch64-linux-android21-clang").absolutePath)
         } catch (e: IOException) {
             throw GradleScriptException("Unable to create build environment", e)
         }
@@ -85,15 +70,10 @@ task("build", type = Exec::class) {
         val current = "git rev-parse --short HEAD || echo unknown".execute(file("src/main/golang/clash"))
 
         buildDir.resolve("intermediate").apply(File::mkdirs).resolve("last_build_commit").writeText(current)
-
-        // Workaround for unable to clean gopath
-        if (Os.isFamily(Os.FAMILY_UNIX) || Os.isFamily(Os.FAMILY_MAC)) {
-            ("chmod -R 700 \"" + buildDir.resolve("intermediate/gopath").absolutePath + "\" || echo \"Change Permission Failure\"").execute(buildDir)
-        }
     }
 
     workingDir = file("src/main/golang/clash")
-    commandLine = listOf("go".exe(), "build", "-ldflags", "-X \"github.com/Dreamacro/clash/constant.Version=${clashVersion()}\" -X \"github.com/Dreamacro/clash/constant.BuildTime=${buildTime()}\" -w -s", "-o", file("$buildDir/outputs/clash").absolutePath)
+    commandLine = listOf("go", "build", "-ldflags", "-X \"github.com/Dreamacro/clash/constant.Version=${clashVersion()}\" -X \"github.com/Dreamacro/clash/constant.BuildTime=${buildTime()}\" -w -s", "-o", file("$buildDir/outputs/clash").absolutePath)
     standardOutput = System.out
     errorOutput = System.err
 }

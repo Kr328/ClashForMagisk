@@ -1,11 +1,9 @@
 package com.github.kr328.clash
 
 import android.util.Log
-import androidx.annotation.Keep
 import java.io.File
 import kotlin.system.exitProcess
 
-@Keep
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {

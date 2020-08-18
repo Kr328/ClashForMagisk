@@ -20,7 +20,7 @@ data class Initial(
         val DEFAULT = Initial()
 
         fun parse(data: String): Initial {
-            return Utils.YAML.parse(serializer(), data)
+            return Utils.YAML.decodeFromString(serializer(), data)
         }
     }
 }

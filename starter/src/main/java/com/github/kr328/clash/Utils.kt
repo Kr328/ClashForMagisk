@@ -6,30 +6,30 @@ import com.github.kr328.clash.model.Clash
 import com.github.kr328.clash.model.Initial
 import java.io.File
 import java.io.IOException
+import java.net.InetAddress
 
 object Utils {
     val YAML = Yaml(configuration = YamlConfiguration(strictMode = false))
 
-    fun splitHostPort(str: String): Pair<String, Int>? {
-        val s = str.split(":")
+    fun splitAddressPort(str: String): Pair<InetAddress, Int> {
+        val indexOfPort = str.lastIndexOf(":")
 
-        if (s.size != 2)
-            return null
+        require(indexOfPort >= 0) { "Port not found" }
 
-        val port = s[1].toIntOrNull() ?: return null
+        val host = str.substring(0..indexOfPort)
+        val port = str.substring(indexOfPort)
 
-        return s[0] to port
+        return InetAddress.getByName(host) to port.toInt()
     }
 
-    fun prepareClash(dataDir: File): Clash {
+    fun parseClash(dataDir: File): Clash {
         val config = dataDir.resolve("config.yaml").takeIf(File::exists)
-                ?: dataDir.resolve("config.yml")
                 ?: throw IOException("Config not found")
 
         return Clash.parse(config.readText())
     }
 
-    fun prepareInitial(coreDir: File, dataDir: File): Initial {
+    fun parseInitial(coreDir: File, dataDir: File): Initial {
         val config = dataDir.resolve("starter.yaml")
         val template = coreDir.resolve("starter.template.yaml")
 
@@ -46,9 +46,9 @@ object Utils {
 
             val content = template.readText()
                     .replace("%%MODE%%",
-                            YAML.stringify(Initial.FMode.serializer(), Initial.FMode(initial.mode)))
+                            YAML.encodeToString(Initial.FMode.serializer(), Initial.FMode(initial.mode)))
                     .replace("%%BLACKLIST%%",
-                            YAML.stringify(Initial.FBlacklist.serializer(), Initial.FBlacklist(initial.blacklist)))
+                            YAML.encodeToString(Initial.FBlacklist.serializer(), Initial.FBlacklist(initial.blacklist)))
 
             config.writeText(content)
 

@@ -56,9 +56,13 @@ class ExecAttribute(
             result[ENV_REDIRECT_PORT] = clash.redirectPort.toString()
 
         if (clash.dns.enable) {
-            Utils.splitHostPort(clash.dns.listen)?.apply {
-                if (second > 0)
-                    result[ENV_DNS_PORT] = second.toString()
+            try {
+                Utils.splitAddressPort(clash.dns.listen).apply {
+                    if (second > 0)
+                        result[ENV_DNS_PORT] = second.toString()
+                }
+            } catch (e: Exception) {
+                Log.w(Constants.TAG, "Parse DNS address failure", e)
             }
         }
 

@@ -1,6 +1,5 @@
 package com.github.kr328.clash.model
 
-import androidx.annotation.Keep
 import com.github.kr328.clash.Utils
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -14,14 +13,12 @@ data class Clash(
         @SerialName("dns") val dns: Dns = Dns(),
         @SerialName("tun") val tun: Tun = Tun()
 ) {
-    @Keep
     @Serializable
     data class Dns(
             @SerialName("enable") val enable: Boolean = false,
             @SerialName("listen") val listen: String = ":0"
     )
 
-    @Keep
     @Serializable
     data class Tun(
             @SerialName("enable") val enable: Boolean = false,
@@ -31,7 +28,7 @@ data class Clash(
 
     companion object {
         fun parse(data: String): Clash {
-            return Utils.YAML.parse(serializer(), data)
+            return Utils.YAML.decodeFromString(serializer(), data)
         }
     }
 }

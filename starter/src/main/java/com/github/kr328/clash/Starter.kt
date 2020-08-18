@@ -13,6 +13,8 @@ class Starter(private val coreDir: File, private val dataDir: File) {
     private val controlObserver = ControlObserver(dataDir, this::onUserControl)
     private val eventQueue = LinkedBlockingQueue<Event>()
     private val indicator = Indicator(dataDir)
+
+    @Volatile
     private var process: ExecProcess? = null
 
     fun exec() {
@@ -30,17 +32,17 @@ class Starter(private val coreDir: File, private val dataDir: File) {
                         if (process != null)
                             continue@loop
 
-                        val initial = Utils.prepareInitial(coreDir, dataDir)
-                        val clash = Utils.prepareClash(dataDir)
+                        val initial = Utils.parseInitial(coreDir, dataDir)
+                        val clash = Utils.parseClash(dataDir)
 
                         val attribute = ExecAttribute(coreDir, dataDir, initial, clash)
-
-                        process = attribute.start()
 
                         thread {
                             eventQueue.offer(Event.STARTED)
 
                             try {
+                                process = attribute.start()
+
                                 process?.exec()
                             } catch (e: Exception) {
                                 Log.w(Constants.TAG, "Clash process failure", e)

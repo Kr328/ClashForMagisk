@@ -1,13 +1,13 @@
 buildscript {
-    val kotlinVersion = "1.3.61"
+    val kotlinVersion: String by project
 
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.5.3")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath("com.android.tools.build:gradle:4.0.1")
+        classpath(kotlin("gradle-plugin", version = kotlinVersion))
         classpath(kotlin("serialization", version = kotlinVersion))
     }
 }

@@ -70,8 +70,8 @@ fun String.execute(pwd: File): String {
 
 gradle.projectsEvaluated {
     tasks.getByName("magisk").dependsOn(
-            project(":clash").tasks.getByName("build"),
-            project(":starter").tasks.getByName("extractExecutable"),
-            project(":starter").tasks.getByName("createStarterJar")
+            project(":clash").tasks["build"],
+            project(":starter").tasks["extractExecutable"],
+            project(":starter").tasks["createStarterJar"]
     )
 }
