@@ -88,7 +88,7 @@ A rule-based tunnel in Go. 此模块为 [clash](https://github.com/Dreamacro/cla
 3. 初始化子仓库
    ```bash
    git submodule init
-   git submodule upate
+   git submodule update
    ```
 
 4. 创建 `local.properties` 在工程根目录  
